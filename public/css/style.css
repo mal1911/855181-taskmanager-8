@@ -148,6 +148,14 @@ body {
   flex-flow: row wrap;
   padding-bottom: 400px;
 }
+
+.board__tasks1 {
+  display: flex;
+  flex-flow: row wrap;
+  padding-bottom: 400px;
+}
+
+
 .board__no-tasks {
   text-align: center;
   text-transform: uppercase;
