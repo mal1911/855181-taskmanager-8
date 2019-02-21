@@ -77,9 +77,8 @@ const getFilterHTML = (objArg) =>
   </label>`;
 
 const getCardHTML = (objArg) => {
-  const getHashtagsHTML = () => {
-    const getHashtagHTML = (title) =>
-      `<span class="card__hashtag-inner">
+  const getHashtagHTML = (title) =>
+    `<span class="card__hashtag-inner">
        <input
          type="hidden"
          name="hashtag"
@@ -96,6 +95,7 @@ const getCardHTML = (objArg) => {
        </button>
      </span>`;
 
+  const getHashtagsHTML = () => {
     let hashtagsHTML = ``;
     if (objArg.hashtags) {
       objArg.hashtags.forEach((obj) => {
