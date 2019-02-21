@@ -1,14 +1,13 @@
 'use strict';
-
 const filterData =
   [
-    {title: `All`, count: 7, isChecked: true},
-    {title: `Overdue`, count: 0, isDisabled: true},
-    {title: `Today`, count: 0, isDisabled: true},
-    {title: `Favorites`, count: 7},
-    {title: `Repeating`, count: 2},
-    {title: `Tags`, count: 6},
-    {title: `Archive`, count: 115}
+    {title: `All`, isChecked: true},
+    {title: `Overdue`, isDisabled: true},
+    {title: `Today`, isDisabled: true},
+    {title: `Favorites`},
+    {title: `Repeating`},
+    {title: `Tags`},
+    {title: `Archive`}
   ];
 
 const cardData =
@@ -52,11 +51,23 @@ const cardData =
     }
   ];
 
+const getRandomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min)) + min;
+
+const getMixArray = (arr) =>
+  arr.slice().sort(() => 0.5 - Math.random());
+
+const getClipArray = (arr, count) =>
+  arr.slice(0, count - 1);
+
+const getRandomArray = (arr, count) =>
+  getClipArray(getMixArray(arr), count);
+
 
 const getFilterHTML = (objArg) =>
   `<input type="radio" id="filter__${objArg.title}" class="filter__input visually-hidden" name="filter" ${objArg.isChecked ? `checked` : ``} ${objArg.isDisabled ? `disabled` : ``}/>
   <label for="filter__${objArg.title.toLowerCase()}" class="filter__label">${objArg.title.toUpperCase()}
-  <span class="filter__${objArg.title.toLowerCase()}-count">${objArg.count}</span>
+  <span class="filter__${objArg.title.toLowerCase()}-count">${getRandomInt(0, cardData.length - 1)}</span>
   </label>`;
 
 const getCardHTML = (objArg) => {
@@ -97,7 +108,6 @@ const getCardHTML = (objArg) => {
     imgName = objArg.imgName;
     imgEmptyClassName = ``;
   }
-
 
   return `<article class="card ${classListHTML}">
             <form class="card__form" method="get">
@@ -350,12 +360,16 @@ const addChildElements = (parentElement, arrArg, getElementHTML) => {
   arrArg.forEach((obj) => {
     elementsHTML += getElementHTML(obj);
   });
-
-  parentElement.insertAdjacentHTML(`afterBegin`, elementsHTML);
+  parentElement.innerHTML = elementsHTML;
 };
 
 const mainFilterElement = document.querySelector(`.main__filter`);
 addChildElements(mainFilterElement, filterData, getFilterHTML);
 
-const boardTasksElement = document.querySelector(`.board__tasks1`);
+const boardTasksElement = document.querySelector(`.board__tasks`);
 addChildElements(boardTasksElement, cardData, getCardHTML);
+
+const onMainFilterElementClick = () => {
+  addChildElements(boardTasksElement, getRandomArray(cardData, getRandomInt(0, cardData.length - 1)), getCardHTML);
+};
+mainFilterElement.addEventListener(`click`, onMainFilterElementClick);
