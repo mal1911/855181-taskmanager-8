@@ -1,6 +1,10 @@
 import {getRandomInt, getRandomArray, addChildElements} from './utils.js';
 import getFilterHTML from './make-filter.js';
 import getCardHTML from './make-task.js';
+import getTaskObj from './data.js';
+import {getHTMLFromData} from "./utils";
+
+const MAX_TASKS = 7;
 
 const filterData =
   [
@@ -13,59 +17,28 @@ const filterData =
     {title: `Archive`}
   ];
 
-const cardData =
-  [
-    {
-      title: `This is example of new task, you can add picture, set date and time, add tags.`,
-      classModificators: [`edit`, `black`],
-      isDisableDateDeadline: true,
-      isDisableRepeatDays: true
-    },
-    {
-      title: `It is example of repeating task. It marks by wave.`,
-      classModificators: [`pink`, `repeat`],
-      hashtags: [`repeat`, `cinema`, `entertaiment`],
-      isDisableDateDeadline: true,
-      isDisableRepeatDays: true
-    },
-    {
-      title: `This is card with missing deadline.`,
-      classModificators: [`yellow`, `deadline`],
-      hashtags: [`repeat`, `cinema`, `entertaiment`],
-      isDisableDateDeadline: true,
-      isDisableRepeatDays: true
-    },
-    {
-      title: `Here is a card with filled data.`,
-      classModificators: [`edit`, `yellow`, `repeat`],
-      imgName: `sample-img.jpg`,
-      hashtags: [`repeat`, `cinema`, `entertaiment`],
-    },
-    {
-      classModificators: [`blue`],
-      hashtags: [`repeat`, `cinema`, `entertaiment`],
-      isDisableDateDeadline: true,
-      isDisableRepeatDays: true
-    },
-    {
-      classModificators: [`blue`],
-      hashtags: [`repeat`, `cinema`, `entertaiment`],
-      imgName: `sample-img.jpg`
-    }
-  ];
+const getCaradsData = (count) => {
+  const arr = [];
+  for (let i = 0; i < count; i++) {
+    arr.push(getTaskObj());
+  }
+  return arr;
+};
+
+const cardsData = getCaradsData(MAX_TASKS);
 
 const main = () => {
   const mainFilterElement = document.querySelector(`.main__filter`);
-  addChildElements(mainFilterElement, filterData, getFilterHTML, cardData.length);
+  addChildElements(mainFilterElement, filterData, getFilterHTML, MAX_TASKS);
 
   const boardTasksElement = document.querySelector(`.board__tasks`);
-  addChildElements(boardTasksElement, cardData, getCardHTML);
+  boardTasksElement.innerHTML = getHTMLFromData(cardsData, getCardHTML);
 
   const onMainFilterElementClick = () => {
-    addChildElements(boardTasksElement, getRandomArray(cardData, getRandomInt(0, cardData.length - 1)), getCardHTML);
+    boardTasksElement.innerHTML = getHTMLFromData(getRandomArray(cardsData, getRandomInt(1, MAX_TASKS)), getCardHTML);
   };
-  mainFilterElement.addEventListener(`click`, onMainFilterElementClick);
 
+  mainFilterElement.addEventListener(`click`, onMainFilterElementClick);
 };
 
 main();

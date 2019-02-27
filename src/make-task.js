@@ -1,4 +1,7 @@
+import {getDateString, getHTMLFromData, getTimeString} from "./utils";
+
 export default (objArg) => {
+
   const getHashtagHTML = (title) =>
     `<span class="card__hashtag-inner">
        <input
@@ -17,25 +20,23 @@ export default (objArg) => {
        </button>
      </span>`;
 
-  const getHashtagsHTML = () => {
-    let hashtagsHTML = ``;
-    if (objArg.hashtags) {
-      objArg.hashtags.forEach((obj) => {
-        hashtagsHTML += getHashtagHTML(obj);
-      });
+  const isDeadline = () =>
+    objArg.dueDate < Date.now();
+
+  const isRepeating = () => {
+    for (let key in objArg.repeatingDays) {
+      if (objArg.repeatingDays[key]) {
+        return true;
+      }
     }
-    return hashtagsHTML;
+    return false;
   };
 
-  const getClassListHTML = () => {
-    let classListHTML = ``;
-    if (objArg.classModificators) {
-      objArg.classModificators.forEach((obj) => {
-        classListHTML += ` card--${obj}`;
-      });
-    }
-    return classListHTML;
-  };
+  const getClassListHTML = () =>
+    ` card--${objArg.color} 
+    ${objArg.isEdit ? ` card--edit` : ``} 
+    ${objArg.isRepeating ? ` card--repeat` : ``}
+    ${isDeadline() ? ` card--deadline` : ``}`;
 
   return `<article class="card ${getClassListHTML()}">
             <form class="card__form" method="get">
@@ -77,13 +78,14 @@ export default (objArg) => {
                         date: <span class="card__date-status">no</span>
                       </button>
 
-                      <fieldset class="card__date-deadline" ${objArg.isDisableDateDeadline ? `disabled` : ``}>
+                      <fieldset class="card__date-deadline" ${isDeadline() ? `disabled` : ``}>
                         <label class="card__input-deadline-wrap">
                           <input
                             class="card__date"
                             type="text"
                             placeholder="23 September"
                             name="date"
+                            value="${getDateString(objArg.dueDate)}"
                           />
                         </label>
                         <label class="card__input-deadline-wrap">
@@ -92,6 +94,7 @@ export default (objArg) => {
                             type="text"
                             placeholder="11:15 PM"
                             name="time"
+                            value="${getTimeString(objArg.dueDate)}"
                           />
                         </label>
                       </fieldset>
@@ -100,7 +103,7 @@ export default (objArg) => {
                         repeat:<span class="card__repeat-status">no</span>
                       </button>
 
-                      <fieldset class="card__repeat-days" ${objArg.isDisableRepeatDays ? `disabled` : ``}>
+                      <fieldset class="card__repeat-days" ${isRepeating() ? `` : ` disabled`}>
                         <div class="card__repeat-days-inner">
                           <input
                             class="visually-hidden card__repeat-day-input"
@@ -108,6 +111,7 @@ export default (objArg) => {
                             id="repeat-mo-1"
                             name="repeat"
                             value="mo"
+                            ${objArg.repeatingDays.mo ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-mo-1"
                             >mo</label
@@ -118,7 +122,7 @@ export default (objArg) => {
                             id="repeat-tu-1"
                             name="repeat"
                             value="tu"
-                            checked
+                            ${objArg.repeatingDays.tu ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-tu-1"
                             >tu</label
@@ -129,6 +133,7 @@ export default (objArg) => {
                             id="repeat-we-1"
                             name="repeat"
                             value="we"
+                            ${objArg.repeatingDays.we ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-we-1"
                             >we</label
@@ -139,6 +144,7 @@ export default (objArg) => {
                             id="repeat-th-1"
                             name="repeat"
                             value="th"
+                            ${objArg.repeatingDays.th ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-th-1"
                             >th</label
@@ -149,7 +155,7 @@ export default (objArg) => {
                             id="repeat-fr-1"
                             name="repeat"
                             value="fr"
-                            checked
+                            ${objArg.repeatingDays.fr ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-fr-1"
                             >fr</label
@@ -159,6 +165,7 @@ export default (objArg) => {
                             type="checkbox"
                             name="repeat"
                             value="sa"
+                            ${objArg.repeatingDays.sa ? `checked` : ``}
                             id="repeat-sa-1"
                           />
                           <label class="card__repeat-day" for="repeat-sa-1"
@@ -170,7 +177,7 @@ export default (objArg) => {
                             id="repeat-su-1"
                             name="repeat"
                             value="su"
-                            checked
+                            ${objArg.repeatingDays.su ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-su-1"
                             >su</label
@@ -180,8 +187,7 @@ export default (objArg) => {
                     </div>
 
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${getHashtagsHTML()}</div>
-
+                      <div class="card__hashtag-list">${getHTMLFromData(Array.from(objArg.tags), getHashtagHTML)}</div>
                       <label>
                         <input
                           type="text"
@@ -193,14 +199,14 @@ export default (objArg) => {
                     </div>
                   </div>
 
-                  <label class="card__img-wrap ${objArg.imgName ? `` : `card__img-wrap--empty`}">
+                  <label class="card__img-wrap ${objArg.picture ? `` : ` card__img-wrap--empty`}">
                     <input
                       type="file"
                       class="card__img-input visually-hidden"
                       name="img"
                     />
                     <img
-                      src="img/${objArg.imgName ? objArg.imgName : `add-photo.svg`}"
+                      src="${objArg.picture ? objArg.picture : `img/add-photo.svg`}"
                       alt="task picture"
                       class="card__img"
                     />
