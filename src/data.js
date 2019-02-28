@@ -1,22 +1,33 @@
 import {getRandomArray, getRandomInt} from "./utils";
 
-export default () => {
-  return {
-    title: [
-      `Изучить теорию`,
-      `Сделать домашку`,
-      `Пройти интенсив на соточку`,
-    ][getRandomInt(0, 2)],
+const titles = [
+  `Изучить теорию`,
+  `Сделать домашку`,
+  `Пройти интенсив на соточку`,
+];
+
+const hashtags = [
+  `homework`,
+  `theory`,
+  `practice`,
+  `intensive`,
+  `keks`,
+];
+
+const colors = [
+  `black`,
+  `yellow`,
+  `blue`,
+  `green`,
+  `pink`];
+
+export default () => (
+  {
+    title: titles[getRandomInt(0, 2)],
     dueDate: Date.now() + getRandomInt(-7, 7) * 24 * 60 * 60 * 1000,
-    tags: new Set(getRandomArray([
-      `homework`,
-      `theory`,
-      `practice`,
-      `intensive`,
-      `keks`,
-    ], getRandomInt(0, 3))),
+    tags: new Set(getRandomArray(hashtags, getRandomInt(0, 3))),
     picture: `http://picsum.photos/100/100?r=${Math.random()}`,
-    color: [`black`, `yellow`, `blue`, `green`, `pink`][getRandomInt(0, 4)],
+    color: colors[getRandomInt(0, 4)],
     repeatingDays: {
       'mo': getRandomInt(0, 1),
       'tu': getRandomInt(0, 1),
@@ -29,5 +40,6 @@ export default () => {
     isFavorite: getRandomInt(0, 1),
     isDone: getRandomInt(0, 1),
     isEdit: getRandomInt(0, 1),
-  };
-};
+  }
+);
+
