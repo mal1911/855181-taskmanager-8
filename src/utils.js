@@ -34,3 +34,13 @@ export const addChildElements = (parentElement, arrArg, getElementHTML, count = 
   });
   parentElement.innerHTML = elementsHTML;
 };
+
+export const removeChildElements = (parentElement) => {
+  parentElement.innerHTML = ``;
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};

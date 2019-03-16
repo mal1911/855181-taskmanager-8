@@ -39,7 +39,6 @@ export default () => (
     },
     isFavorite: getRandomInt(0, 1),
     isDone: getRandomInt(0, 1),
-    isEdit: getRandomInt(0, 1),
   }
 );
 

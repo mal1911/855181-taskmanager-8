@@ -1,9 +1,42 @@
-import {getDateString, getHTMLFromData, getTimeString} from "./utils";
+import {getDateString, getHTMLFromData, getTimeString, createElement} from "./utils";
 
-export default (objArg) => {
+export default class {
 
-  const getHashtagHTML = (title) =>
-    `<span class="card__hashtag-inner">
+  constructor(data) {
+    this._title = data.title;
+    this._dueDate = data.dueDate;
+    this._tags = data.tags;
+    this._picture = data.picture;
+    this._repeatingDays = data.repeatingDays;
+    this._color = data.color;
+
+    this._element = null;
+    this._state = {
+      // Состояние компонента
+    };
+
+    this._onSubmit = null;
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+  }
+
+
+  _isRepeated() {
+    return Object.values(this._repeatingDays).some((it) => it === true);
+  }
+
+  _isDeadLine() {
+    return this._dueDate < Date.now();
+  }
+
+  _getClassListHTML() {
+    return ` card--${this._color}
+    card--edit  
+    ${this._isRepeated() ? ` card--repeat` : ``}
+    ${this._isDeadLine() ? ` card--deadline` : ``}`;
+  }
+
+  _getHashtagHTML(title) {
+    return `<span class="card__hashtag-inner">
        <input
          type="hidden"
          name="hashtag"
@@ -19,26 +52,26 @@ export default (objArg) => {
          delete
        </button>
      </span>`;
+  }
 
-  const isDeadline = () =>
-    objArg.dueDate < Date.now();
 
-  const isRepeating = () => {
-    for (let key in objArg.repeatingDays) {
-      if (objArg.repeatingDays[key]) {
-        return true;
-      }
-    }
-    return false;
-  };
+  _onSubmitButtonClick(evt) {
+    evt.preventDefault();
+    return typeof this._onSubmit === `function` && this._onSubmit();
+  }
 
-  const getClassListHTML = () =>
-    ` card--${objArg.color} 
-    ${objArg.isEdit ? ` card--edit` : ``} 
-    ${objArg.isRepeating ? ` card--repeat` : ``}
-    ${isDeadline() ? ` card--deadline` : ``}`;
 
-  return `<article class="card ${getClassListHTML()}">
+  set onSubmit(fn) {
+    this._onSubmit = fn;
+  }
+
+  get element() {
+    return this._element;
+  }
+
+
+  get template() {
+    return `<article class="card ${this._getClassListHTML()}">
             <form class="card__form" method="get">
               <div class="card__inner">
                 <div class="card__control">
@@ -67,7 +100,7 @@ export default (objArg) => {
                     <textarea
                       class="card__text"
                       placeholder="Start typing your text here..."
-                      name="text">${objArg.title ? objArg.title : ``}</textarea>
+                      name="text">${this._title}</textarea>
                   </label>
                 </div>
 
@@ -78,14 +111,14 @@ export default (objArg) => {
                         date: <span class="card__date-status">no</span>
                       </button>
 
-                      <fieldset class="card__date-deadline" ${isDeadline() ? `disabled` : ``}>
+                      <fieldset class="card__date-deadline" ${this._isDeadLine() ? `disabled` : ``}>
                         <label class="card__input-deadline-wrap">
                           <input
                             class="card__date"
                             type="text"
                             placeholder="23 September"
                             name="date"
-                            value="${getDateString(objArg.dueDate)}"
+                            value="${getDateString(this._dueDate)}"
                           />
                         </label>
                         <label class="card__input-deadline-wrap">
@@ -94,7 +127,7 @@ export default (objArg) => {
                             type="text"
                             placeholder="11:15 PM"
                             name="time"
-                            value="${getTimeString(objArg.dueDate)}"
+                            value="${getTimeString(this._dueDate)}"
                           />
                         </label>
                       </fieldset>
@@ -103,7 +136,7 @@ export default (objArg) => {
                         repeat:<span class="card__repeat-status">no</span>
                       </button>
 
-                      <fieldset class="card__repeat-days" ${isRepeating() ? `` : ` disabled`}>
+                      <fieldset class="card__repeat-days" ${this._isRepeated() ? `` : ` disabled`}>
                         <div class="card__repeat-days-inner">
                           <input
                             class="visually-hidden card__repeat-day-input"
@@ -111,7 +144,7 @@ export default (objArg) => {
                             id="repeat-mo-1"
                             name="repeat"
                             value="mo"
-                            ${objArg.repeatingDays.mo ? `checked` : ``}
+                            ${this._repeatingDays.mo ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-mo-1"
                             >mo</label
@@ -122,7 +155,7 @@ export default (objArg) => {
                             id="repeat-tu-1"
                             name="repeat"
                             value="tu"
-                            ${objArg.repeatingDays.tu ? `checked` : ``}
+                            ${this._repeatingDays.tu ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-tu-1"
                             >tu</label
@@ -133,7 +166,7 @@ export default (objArg) => {
                             id="repeat-we-1"
                             name="repeat"
                             value="we"
-                            ${objArg.repeatingDays.we ? `checked` : ``}
+                            ${this._repeatingDays.we ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-we-1"
                             >we</label
@@ -144,7 +177,7 @@ export default (objArg) => {
                             id="repeat-th-1"
                             name="repeat"
                             value="th"
-                            ${objArg.repeatingDays.th ? `checked` : ``}
+                            ${this._repeatingDays.th ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-th-1"
                             >th</label
@@ -155,7 +188,7 @@ export default (objArg) => {
                             id="repeat-fr-1"
                             name="repeat"
                             value="fr"
-                            ${objArg.repeatingDays.fr ? `checked` : ``}
+                            ${this._repeatingDays.fr ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-fr-1"
                             >fr</label
@@ -165,7 +198,7 @@ export default (objArg) => {
                             type="checkbox"
                             name="repeat"
                             value="sa"
-                            ${objArg.repeatingDays.sa ? `checked` : ``}
+                            ${this._repeatingDays.sa ? `checked` : ``}
                             id="repeat-sa-1"
                           />
                           <label class="card__repeat-day" for="repeat-sa-1"
@@ -177,7 +210,7 @@ export default (objArg) => {
                             id="repeat-su-1"
                             name="repeat"
                             value="su"
-                            ${objArg.repeatingDays.su ? `checked` : ``}
+                            ${this._repeatingDays.su ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-su-1"
                             >su</label
@@ -187,7 +220,7 @@ export default (objArg) => {
                     </div>
 
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${getHTMLFromData(Array.from(objArg.tags), getHashtagHTML)}</div>
+                      <div class="card__hashtag-list">${getHTMLFromData(Array.from(this._tags), this._getHashtagHTML)}</div>
                       <label>
                         <input
                           type="text"
@@ -199,14 +232,14 @@ export default (objArg) => {
                     </div>
                   </div>
 
-                  <label class="card__img-wrap ${objArg.picture ? `` : ` card__img-wrap--empty`}">
+                  <label class="card__img-wrap ${this._picture ? `` : ` card__img-wrap--empty`}">
                     <input
                       type="file"
                       class="card__img-input visually-hidden"
                       name="img"
                     />
                     <img
-                      src="${objArg.picture ? objArg.picture : `img/add-photo.svg`}"
+                      src="${this._picture ? this._picture : `img/add-photo.svg`}"
                       alt="task picture"
                       class="card__img"
                     />
@@ -287,4 +320,27 @@ export default (objArg) => {
               </div>
             </form>
           </article>`;
-};
+  }
+
+  bind() {
+    this._element.querySelector(`.card__form`)
+      .addEventListener(`submit`, this._onSubmitButtonClick);
+  }
+
+  render() {
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
+  }
+
+  unbind() {
+    this._element.querySelector(`.card__form`)
+      .removeEventListener(`submit`, this._onSubmitButtonClick);
+  }
+
+  unrender() {
+    this.unbind();
+    this._element = null;
+  }
+
+}

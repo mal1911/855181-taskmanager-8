@@ -1,4 +1,6 @@
-class Task {
+import {getDateString, getHTMLFromData, getTimeString, createElement} from "./utils";
+
+export default class {
 
   constructor(data) {
     this._title = data.title;
@@ -14,6 +16,7 @@ class Task {
     };
 
     this._onEdit = null;
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
 
@@ -21,22 +24,18 @@ class Task {
     return Object.values(this._repeatingDays).some((it) => it === true);
   }
 
-  _onEditButtonClick() {
-    typeof this._onEdit === `function` && this._onEdit();
+  _isDeadLine() {
+    return this._dueDate < Date.now();
   }
 
-  get element() {
-    return this._element;
+  _getClassListHTML() {
+    return ` card--${this._color} 
+    ${this._isRepeated() ? ` card--repeat` : ``}
+    ${this._isDeadLine() ? ` card--deadline` : ``}`;
   }
 
-  set onEdit(fn) {
-    this._onEdit = fn;
-  }
-
-
-  get template() {
-    const getHashtagHTML = (title) =>
-      `<span class="card__hashtag-inner">
+  _getHashtagHTML(title) {
+    return `<span class="card__hashtag-inner">
        <input
          type="hidden"
          name="hashtag"
@@ -52,26 +51,23 @@ class Task {
          delete
        </button>
      </span>`;
+  }
 
-    const isDeadline = () =>
-      objArg.dueDate < Date.now();
+  _onEditButtonClick() {
+    return typeof this._onEdit === `function` && this._onEdit();
+  }
 
-    const isRepeating = () => {
-      for (let key in objArg.repeatingDays) {
-        if (objArg.repeatingDays[key]) {
-          return true;
-        }
-      }
-      return false;
-    };
+  get element() {
+    return this._element;
+  }
 
-    const getClassListHTML = () =>
-      ` card--${objArg.color} 
-    ${objArg.isEdit ? ` card--edit` : ``} 
-    ${objArg.isRepeating ? ` card--repeat` : ``}
-    ${isDeadline() ? ` card--deadline` : ``}`;
+  set onEdit(fn) {
+    this._onEdit = fn;
+  }
 
-    return `<article class="card ${getClassListHTML()}">
+
+  get template() {
+    return `<article class="card ${this._getClassListHTML()}">
             <form class="card__form" method="get">
               <div class="card__inner">
                 <div class="card__control">
@@ -100,7 +96,7 @@ class Task {
                     <textarea
                       class="card__text"
                       placeholder="Start typing your text here..."
-                      name="text">${objArg.title ? objArg.title : ``}</textarea>
+                      name="text">${this._title}</textarea>
                   </label>
                 </div>
 
@@ -111,14 +107,14 @@ class Task {
                         date: <span class="card__date-status">no</span>
                       </button>
 
-                      <fieldset class="card__date-deadline" ${isDeadline() ? `disabled` : ``}>
+                      <fieldset class="card__date-deadline" ${this._isDeadLine() ? `disabled` : ``}>
                         <label class="card__input-deadline-wrap">
                           <input
                             class="card__date"
                             type="text"
                             placeholder="23 September"
                             name="date"
-                            value="${getDateString(objArg.dueDate)}"
+                            value="${getDateString(this._dueDate)}"
                           />
                         </label>
                         <label class="card__input-deadline-wrap">
@@ -127,7 +123,7 @@ class Task {
                             type="text"
                             placeholder="11:15 PM"
                             name="time"
-                            value="${getTimeString(objArg.dueDate)}"
+                            value="${getTimeString(this._dueDate)}"
                           />
                         </label>
                       </fieldset>
@@ -136,7 +132,7 @@ class Task {
                         repeat:<span class="card__repeat-status">no</span>
                       </button>
 
-                      <fieldset class="card__repeat-days" ${isRepeating() ? `` : ` disabled`}>
+                      <fieldset class="card__repeat-days" ${this._isRepeated() ? `` : ` disabled`}>
                         <div class="card__repeat-days-inner">
                           <input
                             class="visually-hidden card__repeat-day-input"
@@ -144,7 +140,7 @@ class Task {
                             id="repeat-mo-1"
                             name="repeat"
                             value="mo"
-                            ${objArg.repeatingDays.mo ? `checked` : ``}
+                            ${this._repeatingDays.mo ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-mo-1"
                             >mo</label
@@ -155,7 +151,7 @@ class Task {
                             id="repeat-tu-1"
                             name="repeat"
                             value="tu"
-                            ${objArg.repeatingDays.tu ? `checked` : ``}
+                            ${this._repeatingDays.tu ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-tu-1"
                             >tu</label
@@ -166,7 +162,7 @@ class Task {
                             id="repeat-we-1"
                             name="repeat"
                             value="we"
-                            ${objArg.repeatingDays.we ? `checked` : ``}
+                            ${this._repeatingDays.we ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-we-1"
                             >we</label
@@ -177,7 +173,7 @@ class Task {
                             id="repeat-th-1"
                             name="repeat"
                             value="th"
-                            ${objArg.repeatingDays.th ? `checked` : ``}
+                            ${this._repeatingDays.th ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-th-1"
                             >th</label
@@ -188,7 +184,7 @@ class Task {
                             id="repeat-fr-1"
                             name="repeat"
                             value="fr"
-                            ${objArg.repeatingDays.fr ? `checked` : ``}
+                            ${this._repeatingDays.fr ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-fr-1"
                             >fr</label
@@ -198,7 +194,7 @@ class Task {
                             type="checkbox"
                             name="repeat"
                             value="sa"
-                            ${objArg.repeatingDays.sa ? `checked` : ``}
+                            ${this._repeatingDays.sa ? `checked` : ``}
                             id="repeat-sa-1"
                           />
                           <label class="card__repeat-day" for="repeat-sa-1"
@@ -210,7 +206,7 @@ class Task {
                             id="repeat-su-1"
                             name="repeat"
                             value="su"
-                            ${objArg.repeatingDays.su ? `checked` : ``}
+                            ${this._repeatingDays.su ? `checked` : ``}
                           />
                           <label class="card__repeat-day" for="repeat-su-1"
                             >su</label
@@ -220,7 +216,7 @@ class Task {
                     </div>
 
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${getHTMLFromData(Array.from(objArg.tags), getHashtagHTML)}</div>
+                      <div class="card__hashtag-list">${getHTMLFromData(Array.from(this._tags), this._getHashtagHTML)}</div>
                       <label>
                         <input
                           type="text"
@@ -232,14 +228,14 @@ class Task {
                     </div>
                   </div>
 
-                  <label class="card__img-wrap ${objArg.picture ? `` : ` card__img-wrap--empty`}">
+                  <label class="card__img-wrap ${this._picture ? `` : ` card__img-wrap--empty`}">
                     <input
                       type="file"
                       class="card__img-input visually-hidden"
                       name="img"
                     />
                     <img
-                      src="${objArg.picture ? objArg.picture : `img/add-photo.svg`}"
+                      src="${this._picture ? this._picture : `img/add-photo.svg`}"
                       alt="task picture"
                       class="card__img"
                     />
@@ -322,5 +318,25 @@ class Task {
           </article>`;
   }
 
+  bind() {
+    this._element.querySelector(`.card__btn--edit`)
+      .addEventListener(`click`, this._onEditButtonClick);
+  }
 
-};
+  render() {
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
+  }
+
+  unbind() {
+    this._element.querySelector(`.card__btn--edit`)
+      .removeEventListener(`click`, this._onEditButtonClick);
+  }
+
+  unrender() {
+    this.unbind();
+    this._element = null;
+  }
+
+}
