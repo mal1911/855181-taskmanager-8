@@ -31,6 +31,7 @@ export default class {
   _getClassListHTML() {
     return ` card--${this._color}
     card--edit  
+    this._isRepeated() && `card--repeat``
     ${this._isRepeated() ? ` card--repeat` : ``}
     ${this._isDeadLine() ? ` card--deadline` : ``}`;
   }
@@ -54,12 +55,10 @@ export default class {
      </span>`;
   }
 
-
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
     return typeof this._onSubmit === `function` && this._onSubmit();
   }
-
 
   set onSubmit(fn) {
     this._onSubmit = fn;
@@ -68,7 +67,6 @@ export default class {
   get element() {
     return this._element;
   }
-
 
   get template() {
     return `<article class="card ${this._getClassListHTML()}">
