@@ -1,8 +1,10 @@
 import {getRandomInt, getRandomArray, addChildElements} from './utils.js';
 import getFilterHTML from './make-filter.js';
-import getCardHTML from './make-task.js';
 import getTaskObj from './data.js';
-import {getHTMLFromData} from "./utils";
+import Task from './task';
+import TaskEdit from './task-edit';
+import {removeChildElements} from "./utils";
+
 
 const MAX_TASKS = 7;
 
@@ -14,7 +16,7 @@ const filterData =
     {title: `Favorites`},
     {title: `Repeating`},
     {title: `Tags`},
-    {title: `Archive`}
+    {title: `Archive`},
   ];
 
 const getCaradsData = (count) => {
@@ -27,15 +29,44 @@ const getCaradsData = (count) => {
 
 const cardsData = getCaradsData(MAX_TASKS);
 
+const renderTasks = (parentElement, tasksCount) => {
+  const data = getRandomArray(cardsData, tasksCount);
+  const fragment = document.createDocumentFragment();
+
+  removeChildElements(parentElement);
+
+  data.forEach((obj) => {
+    const taskComponent = new Task(obj);
+    const editTaskComponent = new TaskEdit(obj);
+
+    taskComponent.onEdit = () => {
+      editTaskComponent.render();
+      parentElement.replaceChild(editTaskComponent.element, taskComponent.element);
+      taskComponent.unrender();
+    };
+
+    editTaskComponent.onSubmit = () => {
+      taskComponent.render();
+      parentElement.replaceChild(taskComponent.element, editTaskComponent.element);
+      editTaskComponent.unrender();
+    };
+
+    fragment.appendChild(taskComponent.render());
+  });
+  parentElement.appendChild(fragment);
+
+};
+
 const main = () => {
   const mainFilterElement = document.querySelector(`.main__filter`);
   addChildElements(mainFilterElement, filterData, getFilterHTML, MAX_TASKS);
 
   const boardTasksElement = document.querySelector(`.board__tasks`);
-  boardTasksElement.innerHTML = getHTMLFromData(cardsData, getCardHTML);
+  renderTasks(boardTasksElement, MAX_TASKS);
 
   const onMainFilterElementClick = () => {
-    boardTasksElement.innerHTML = getHTMLFromData(getRandomArray(cardsData, getRandomInt(1, MAX_TASKS)), getCardHTML);
+    renderTasks(boardTasksElement, getRandomInt(1, MAX_TASKS));
+
   };
 
   mainFilterElement.addEventListener(`click`, onMainFilterElementClick);
