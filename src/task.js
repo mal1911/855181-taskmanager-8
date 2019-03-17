@@ -1,24 +1,18 @@
-import {getDateString, getHTMLFromData, getTimeString, createElement} from "./utils";
+import {getDateString, getHTMLFromData, getTimeString} from "./utils";
+import Component from './component';
 
-export default class {
-
+export default class extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._dueDate = data.dueDate;
     this._tags = data.tags;
     this._picture = data.picture;
     this._repeatingDays = data.repeatingDays;
     this._color = data.color;
-
-    this._element = null;
-    this._state = {
-      // Состояние компонента
-    };
-
     this._onEdit = null;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
-
 
   _isRepeated() {
     return Object.values(this._repeatingDays).some((it) => it === true);
@@ -57,14 +51,9 @@ export default class {
     return typeof this._onEdit === `function` && this._onEdit();
   }
 
-  get element() {
-    return this._element;
-  }
-
   set onEdit(fn) {
     this._onEdit = fn;
   }
-
 
   get template() {
     return `<article class="card ${this._getClassListHTML()}">
@@ -323,20 +312,8 @@ export default class {
       .addEventListener(`click`, this._onEditButtonClick);
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
   unbind() {
     this._element.querySelector(`.card__btn--edit`)
       .removeEventListener(`click`, this._onEditButtonClick);
   }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
 }
