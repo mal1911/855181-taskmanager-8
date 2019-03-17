@@ -1,7 +1,7 @@
 import {getDateString, getHTMLFromData, getTimeString} from "./utils";
 import Component from './component';
 
-export default class extends Component{
+export default class extends Component {
   constructor(data) {
     super();
     this._title = data.title;
