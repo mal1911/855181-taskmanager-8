@@ -1,24 +1,18 @@
-import {getDateString, getHTMLFromData, getTimeString, createElement} from "./utils";
+import {getDateString, getHTMLFromData, getTimeString} from "./utils";
+import Component from './component';
 
-export default class {
-
+export default class extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._dueDate = data.dueDate;
     this._tags = data.tags;
     this._picture = data.picture;
     this._repeatingDays = data.repeatingDays;
     this._color = data.color;
-
-    this._element = null;
-    this._state = {
-      // Состояние компонента
-    };
-
     this._onSubmit = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
   }
-
 
   _isRepeated() {
     return Object.values(this._repeatingDays).some((it) => it === true);
@@ -31,7 +25,6 @@ export default class {
   _getClassListHTML() {
     return ` card--${this._color}
     card--edit  
-    this._isRepeated() && `card--repeat``
     ${this._isRepeated() ? ` card--repeat` : ``}
     ${this._isDeadLine() ? ` card--deadline` : ``}`;
   }
@@ -62,10 +55,6 @@ export default class {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -325,20 +314,8 @@ export default class {
       .addEventListener(`submit`, this._onSubmitButtonClick);
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
   unbind() {
     this._element.querySelector(`.card__form`)
       .removeEventListener(`submit`, this._onSubmitButtonClick);
   }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
 }
