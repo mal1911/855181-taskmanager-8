@@ -10,6 +10,7 @@ export default class extends Component {
     this._picture = data.picture;
     this._repeatingDays = data.repeatingDays;
     this._color = data.color;
+
     this._onEdit = null;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
@@ -315,5 +316,12 @@ export default class extends Component {
   unbind() {
     this._element.querySelector(`.card__btn--edit`)
       .removeEventListener(`click`, this._onEditButtonClick);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
   }
 }
