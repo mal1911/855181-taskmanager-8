@@ -42,6 +42,7 @@ const renderTasks = (parentElement, tasksCount) => {
     taskComponent.onEdit = () => {
       editTaskComponent.render();
       parentElement.replaceChild(editTaskComponent.element, taskComponent.element);
+      editTaskComponent.refresh();
       taskComponent.unrender();
     };
 

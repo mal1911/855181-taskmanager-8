@@ -1,5 +1,7 @@
 import {getDateString, getHTMLFromData, getTimeString} from "./utils";
 import Component from './component';
+import moment from 'moment';
+
 
 export default class extends Component {
   constructor(data) {
@@ -92,117 +94,10 @@ export default class extends Component {
 
                 <div class="card__settings">
                   <div class="card__details">
-                    <div class="card__dates visually-hidden">
-                      <button class="card__date-deadline-toggle" type="button">
-                        date: <span class="card__date-status">no</span>
-                      </button>
-
-                      <fieldset class="card__date-deadline">
-                        <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__date"
-                            type="text"
-                            placeholder="23 September"
-                            name="date"
-                            value="${getDateString(this._dueDate)}"
-                          />
-                        </label>
-                        <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__time"
-                            type="text"
-                            placeholder="11:15 PM"
-                            name="time"
-                            value="${getTimeString(this._dueDate)}"
-                          />
-                        </label>
-                      </fieldset>
-
-                      <button class="card__repeat-toggle" type="button">
-                        repeat:<span class="card__repeat-status">no</span>
-                      </button>
-
-                      <fieldset class="card__repeat-days" ${this._isRepeated() ? `` : ` disabled`}>
-                        <div class="card__repeat-days-inner">
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-mo-1"
-                            name="repeat"
-                            value="mo"
-                            ${this._repeatingDays.mo ? `checked` : ``}
-                          />
-                          <label class="card__repeat-day" for="repeat-mo-1"
-                            >mo</label
-                          >
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-tu-1"
-                            name="repeat"
-                            value="tu"
-                            ${this._repeatingDays.tu ? `checked` : ``}
-                          />
-                          <label class="card__repeat-day" for="repeat-tu-1"
-                            >tu</label
-                          >
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-we-1"
-                            name="repeat"
-                            value="we"
-                            ${this._repeatingDays.we ? `checked` : ``}
-                          />
-                          <label class="card__repeat-day" for="repeat-we-1"
-                            >we</label
-                          >
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-th-1"
-                            name="repeat"
-                            value="th"
-                            ${this._repeatingDays.th ? `checked` : ``}
-                          />
-                          <label class="card__repeat-day" for="repeat-th-1"
-                            >th</label
-                          >
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-fr-1"
-                            name="repeat"
-                            value="fr"
-                            ${this._repeatingDays.fr ? `checked` : ``}
-                          />
-                          <label class="card__repeat-day" for="repeat-fr-1"
-                            >fr</label
-                          >
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            name="repeat"
-                            value="sa"
-                            ${this._repeatingDays.sa ? `checked` : ``}
-                            id="repeat-sa-1"
-                          />
-                          <label class="card__repeat-day" for="repeat-sa-1"
-                            >sa</label
-                          >
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-su-1"
-                            name="repeat"
-                            value="su"
-                            ${this._repeatingDays.su ? `checked` : ``}
-                          />
-                          <label class="card__repeat-day" for="repeat-su-1"
-                            >su</label
-                          >
+                    <div class="card__dates">
+                        <div class="card__date">
+                          ${moment(this._dueDate).format(`DD MMMM hh:mm`)}
                         </div>
-                      </fieldset>
                     </div>
 
                     <div class="card__hashtag">
