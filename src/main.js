@@ -35,9 +35,9 @@ const renderTasks = (parentElement, tasksCount) => {
 
   removeChildElements(parentElement);
 
-  data.forEach((obj) => {
-    const taskComponent = new Task(obj);
-    const editTaskComponent = new TaskEdit(obj);
+  data.forEach((task) => {
+    const taskComponent = new Task(task);
+    const editTaskComponent = new TaskEdit(task);
 
     taskComponent.onEdit = () => {
       editTaskComponent.render();
@@ -45,7 +45,14 @@ const renderTasks = (parentElement, tasksCount) => {
       taskComponent.unrender();
     };
 
-    editTaskComponent.onSubmit = () => {
+    editTaskComponent.onSubmit = (newObject) => {
+      task.title = newObject.title;
+      task.tags = newObject.tags;
+      task.color = newObject.color;
+      task.repeatingDays = newObject.repeatingDays;
+      task.dueDate = newObject.dueDate;
+
+      taskComponent.update(task);
       taskComponent.render();
       parentElement.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
@@ -54,7 +61,6 @@ const renderTasks = (parentElement, tasksCount) => {
     fragment.appendChild(taskComponent.render());
   });
   parentElement.appendChild(fragment);
-
 };
 
 const main = () => {
@@ -62,13 +68,13 @@ const main = () => {
   addChildElements(mainFilterElement, filterData, getFilterHTML, MAX_TASKS);
 
   const boardTasksElement = document.querySelector(`.board__tasks`);
+
   renderTasks(boardTasksElement, MAX_TASKS);
 
   const onMainFilterElementClick = () => {
     renderTasks(boardTasksElement, getRandomInt(1, MAX_TASKS));
 
   };
-
   mainFilterElement.addEventListener(`click`, onMainFilterElementClick);
 };
 

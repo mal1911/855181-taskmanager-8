@@ -26,8 +26,8 @@ export default class extends Component {
   _getClassListHTML() {
     return ` card--${this._color} 
     ${this._isRepeated() ? ` card--repeat` : ``}
-    ${this._isDeadLine() ? ` card--deadline` : ``}`;
-  }
+    `;
+  } // ${this._isDeadLine() ? ` card--deadline` : ``}
 
   _getHashtagHTML(title) {
     return `<span class="card__hashtag-inner">
@@ -92,12 +92,12 @@ export default class extends Component {
 
                 <div class="card__settings">
                   <div class="card__details">
-                    <div class="card__dates">
+                    <div class="card__dates visually-hidden">
                       <button class="card__date-deadline-toggle" type="button">
                         date: <span class="card__date-status">no</span>
                       </button>
 
-                      <fieldset class="card__date-deadline" ${this._isDeadLine() ? `disabled` : ``}>
+                      <fieldset class="card__date-deadline">
                         <label class="card__input-deadline-wrap">
                           <input
                             class="card__date"
@@ -307,7 +307,7 @@ export default class extends Component {
             </form>
           </article>`;
   }
-
+//${this._isDeadLine() ? `disabled` : ``}
   bind() {
     this._element.querySelector(`.card__btn--edit`)
       .addEventListener(`click`, this._onEditButtonClick);
@@ -323,5 +323,8 @@ export default class extends Component {
     this._tags = data.tags;
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
+    this._dueDate = data.dueDate;
+
+    console.log(data.dueDate);
   }
 }

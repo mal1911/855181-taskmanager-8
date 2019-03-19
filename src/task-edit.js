@@ -1,6 +1,8 @@
 import {getDateString, getHTMLFromData, getTimeString} from "./utils";
 import Component from './component';
 import flatpickr from 'flatpickr';
+import '../node_modules/flatpickr/dist/flatpickr.min.css';
+
 
 export default class TaskEdit extends Component {
   constructor(data) {
@@ -49,7 +51,6 @@ export default class TaskEdit extends Component {
     return entry;
   }
 
-
   _isRepeated() {
     return Object.values(this._repeatingDays).some((it) => it === true);
   }
@@ -62,8 +63,8 @@ export default class TaskEdit extends Component {
     return ` card--${this._color}
     card--edit  
     ${this._isRepeated() ? ` card--repeat` : ``}
-    ${this._isDeadLine() ? ` card--deadline` : ``}`;
-  }
+    `;
+  } //${this._isDeadLine() ? ` card--deadline` : ``}
 
   _getHashtagHTML(title) {
     return `<span class="card__hashtag-inner">
@@ -88,8 +89,8 @@ export default class TaskEdit extends Component {
     evt.preventDefault();
     const formData = new FormData(this._element.querySelector(`.card__form`));
     const newData = this._processForm(formData);
+    typeof this._onSubmit === `function` && this._onSubmit(newData);
     this.update(newData);
-    return typeof this._onSubmit === `function` && this._onSubmit();
   }
 
   _onChangeDate() {
@@ -152,89 +153,81 @@ export default class TaskEdit extends Component {
                   <div class="card__details">
                     <div class="card__dates">
                       <button class="card__date-deadline-toggle" type="button">
-                        date: <span class="card__date-status">no</span>
+                        date: <span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
                       </button>
-
-                      <fieldset class="card__date-deadline" ${this._isDeadLine() ? `disabled` : ``}>
+                      
+                      <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
                         <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__date"
-                            type="text"
-                            placeholder="23 September"
-                            name="date"
+                          <input class="card__date" type="text" placeholder="23 September" name="date"
                             value="${getDateString(this._dueDate)}"
                           />
                         </label>
                         <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__time"
-                            type="text"
-                            placeholder="11:15 PM"
-                            name="time"
+                          <input class="card__time" type="text" placeholder="11:15 PM" name="time" 
                             value="${getTimeString(this._dueDate)}"
                           />
                         </label>
                       </fieldset>
-
-                      <button class="card__repeat-toggle" type="button">
-                        repeat:<span class="card__repeat-status">no</span>
-                      </button>
-
-                      <fieldset class="card__repeat-days" ${this._isRepeated() ? `` : ` disabled`}>
-                        <div class="card__repeat-days-inner">
-                          <input
-                            class="visually-hidden card__repeat-day-input"
-                            type="checkbox"
-                            id="repeat-mo-1"
-                            name="repeat"
-                            value="mo"
-                            ${this._repeatingDays.mo ? `checked` : ``}
+  
+                        <button class="card__repeat-toggle" type="button">
+                          repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
+                        </button>
+  
+                        <fieldset class="card__repeat-days" ${!this._state.isRepeated && `disabled`}>
+                          <div class="card__repeat-days-inner">
+                            <input
+                              class="visually-hidden card__repeat-day-input"
+                              type="checkbox"
+                              id="repeat-mo-5"
+                              name="repeat"
+                              value="mo"
+                              ${this._repeatingDays.mo && `checked`}
                           />
-                          <label class="card__repeat-day" for="repeat-mo-1"
+                          <label class="card__repeat-day" for="repeat-mo-5"
                             >mo</label
                           >
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
-                            id="repeat-tu-1"
+                            id="repeat-tu-5"
                             name="repeat"
                             value="tu"
-                            ${this._repeatingDays.tu ? `checked` : ``}
+                            ${this._repeatingDays.tu && `checked`}
                           />
-                          <label class="card__repeat-day" for="repeat-tu-1"
+                          <label class="card__repeat-day" for="repeat-tu-5"
                             >tu</label
                           >
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
-                            id="repeat-we-1"
+                            id="repeat-we-5"
                             name="repeat"
                             value="we"
-                            ${this._repeatingDays.we ? `checked` : ``}
+                            ${this._repeatingDays.we && `checked`}
                           />
-                          <label class="card__repeat-day" for="repeat-we-1"
+                          <label class="card__repeat-day" for="repeat-we-5"
                             >we</label
                           >
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
-                            id="repeat-th-1"
+                            id="repeat-th-5"
                             name="repeat"
                             value="th"
-                            ${this._repeatingDays.th ? `checked` : ``}
+                            ${this._repeatingDays.th && `checked`}
                           />
-                          <label class="card__repeat-day" for="repeat-th-1"
+                          <label class="card__repeat-day" for="repeat-th-5"
                             >th</label
                           >
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
-                            id="repeat-fr-1"
+                            id="repeat-fr-5"
                             name="repeat"
                             value="fr"
-                            ${this._repeatingDays.fr ? `checked` : ``}
+                            ${this._repeatingDays.fr && `checked`}
                           />
-                          <label class="card__repeat-day" for="repeat-fr-1"
+                          <label class="card__repeat-day" for="repeat-fr-5"
                             >fr</label
                           >
                           <input
@@ -242,21 +235,21 @@ export default class TaskEdit extends Component {
                             type="checkbox"
                             name="repeat"
                             value="sa"
-                            ${this._repeatingDays.sa ? `checked` : ``}
-                            id="repeat-sa-1"
+                            ${this._repeatingDays.sa && `checked`}
+                            id="repeat-sa-5"
                           />
-                          <label class="card__repeat-day" for="repeat-sa-1"
+                          <label class="card__repeat-day" for="repeat-sa-5"
                             >sa</label
                           >
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
-                            id="repeat-su-1"
+                            id="repeat-su-5"
                             name="repeat"
                             value="su"
-                            ${this._repeatingDays.su ? `checked` : ``}
+                            ${this._repeatingDays.su && `checked`}
                           />
-                          <label class="card__repeat-day" for="repeat-su-1"
+                          <label class="card__repeat-day" for="repeat-su-5"
                             >su</label
                           >
                         </div>
@@ -294,76 +287,80 @@ export default class TaskEdit extends Component {
                     <div class="card__colors-wrap">
                       <input
                         type="radio"
-                        id="color-black-1"
+                        id="color-black-5"
                         class="card__color-input card__color-input--black visually-hidden"
                         name="color"
                         value="black"
-                        checked
+                        ${this._color === `black` ? `checked` : ``}
                       />
                       <label
-                        for="color-black-1"
+                        for="color-black-5"
                         class="card__color card__color--black"
                         >black</label
                       >
                       <input
                         type="radio"
-                        id="color-yellow-1"
+                        id="color-yellow-5"
                         class="card__color-input card__color-input--yellow visually-hidden"
                         name="color"
                         value="yellow"
-                      />
-                      <label
-                        for="color-yellow-1"
-                        class="card__color card__color--yellow"
-                        >yellow</label
-                      >
-                      <input
-                        type="radio"
-                        id="color-blue-1"
-                        class="card__color-input card__color-input--blue visually-hidden"
-                        name="color"
-                        value="blue"
-                      />
-                      <label
-                        for="color-blue-1"
-                        class="card__color card__color--blue"
-                        >blue</label
-                      >
-                      <input
-                        type="radio"
-                        id="color-green-1"
-                        class="card__color-input card__color-input--green visually-hidden"
-                        name="color"
-                        value="green"
-                      />
-                      <label
-                        for="color-green-1"
-                        class="card__color card__color--green"
-                        >green</label
-                      >
-                      <input
-                        type="radio"
-                        id="color-pink-1"
-                        class="card__color-input card__color-input--pink visually-hidden"
-                        name="color"
-                        value="pink"
-                      />
-                      <label
-                        for="color-pink-1"
-                        class="card__color card__color--pink"
-                        >pink</label
-                      >
-                    </div>
-                  </div>
-                </div>
+                        ${this._color === `yellow` ? `checked` : ``}                        
+                        />
+                        <label
+                          for="color-yellow-5"
+                          class="card__color card__color--yellow"
+                          >yellow</label
+                        >
+                        <input
+                          type="radio"
+                          id="color-blue-5"
+                          class="card__color-input card__color-input--blue visually-hidden"
+                          name="color"
+                          value="blue"
+                          ${this._color === `blue` ? `checked` : ``}                          
+                          />
+                          <label
+                            for="color-blue-5"
+                            class="card__color card__color--blue"
+                            >blue</label
+                          >
+                          <input
+                            type="radio"
+                            id="color-green-5"
+                            class="card__color-input card__color-input--green visually-hidden"
+                            name="color"
+                            value="green"
+                            ${this._color === `green` ? `checked` : ``}                            
+                            />
+                            <label
+                              for="color-green-5"
+                              class="card__color card__color--green"
+                              >green</label
+                            >
+                            <input
+                              type="radio"
+                              id="color-pink-5"
+                              class="card__color-input card__color-input--pink visually-hidden"
+                              name="color"
+                              value="pink"
+                              ${this._color === `pink` ? `checked` : ``}
+                              />
+                              <label
+                                for="color-pink-5"
+                                class="card__color card__color--pink"
+                                >pink</label
+                              >
+                            </div>
+                          </div>
+                        </div>
 
-                <div class="card__status-btns">
-                  <button class="card__save" type="submit">save</button>
-                  <button class="card__delete" type="button">delete</button>
-                </div>
-              </div>
-            </form>
-          </article>`;
+                        <div class="card__status-btns">
+                          <button class="card__save" type="submit">save</button>
+                          <button class="card__delete" type="button">delete</button>
+                        </div>
+                      </div>
+                    </form>
+                  </article>`;
   }
 
   bind() {
