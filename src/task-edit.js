@@ -1,4 +1,4 @@
-import {getDateString, getHTMLFromData, getTimeString} from "./utils";
+import {getHTMLFromData} from './utils';
 import Component from './component';
 import flatpickr from 'flatpickr';
 import '../node_modules/flatpickr/dist/flatpickr.min.css';
@@ -24,6 +24,8 @@ export default class TaskEdit extends Component {
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
 
+    this._setStartDate(this._dueDate);
+    this._setStartTime(this._dueDate);
   }
 
   _processForm(formData) {
@@ -46,14 +48,16 @@ export default class TaskEdit extends Component {
 
     for (const pair of formData.entries()) {
       const [property, value] = pair;
-      taskEditMapper[property] && taskEditMapper[property](value);
+      if (taskEditMapper[property]) {
+        taskEditMapper[property](value);
+      }
     }
 
-    console.log(new Date(this._dueDate));
-
-    entry.dueDate = new Date(this._dueDate);
-    console.log(entry);
-
+    if (this._dueStartDate && this._dueStartTime) {
+      entry.dueDate = moment(this._dueStartDate + this._dueStartTime).utc(false);
+    } else {
+      entry.dueDate = this._dueDate;
+    }
     return entry;
   }
 
@@ -72,14 +76,6 @@ export default class TaskEdit extends Component {
         target.repeatingDays[value] = true;
         return target.repeatingDays[value];
       },
-      /*date: (value) => {
-        target.dueDate = Date.parse(value + ` ` + new Date(Date.now()).getFullYear());
-      },
-      time: (value) => {
-
-        //console.log(moment(value));
-        return target.dueDate;
-      },*/
     };
   }
 
@@ -93,10 +89,11 @@ export default class TaskEdit extends Component {
 
   _getClassListHTML() {
     return ` card--${this._color}
-    card--edit  
-    ${this._isRepeated() ? ` card--repeat` : ``}
-    `;
-  } //${this._isDeadLine() ? ` card--deadline` : ``}
+           card--edit  
+           ${this._isDeadLine() ? ` card--deadline` : ``}   
+           ${this._isRepeated() ? ` card--repeat` : ``}
+           `;
+  }
 
   _getHashtagHTML(title) {
     return `<span class="card__hashtag-inner">
@@ -122,7 +119,9 @@ export default class TaskEdit extends Component {
     const formData = new FormData(this._element.querySelector(`.card__form`));
     const newData = this._processForm(formData);
 
-    typeof this._onSubmit === `function` && this._onSubmit(newData);
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(newData);
+    }
     this.update(newData);
   }
 
@@ -398,15 +397,22 @@ export default class TaskEdit extends Component {
                   </article>`;
   }
 
-  _onCangeCardDate(dateObj) {
-    this._dueDate = dateObj;
-    console.log(new Date(this._dueDate));
+  _setStartDate(dateObj) {
+    this._dueStartDate = moment(dateObj).startOf(`day`).utc(true);
+  }
 
+  _onCangeCardDate(dateObj) {
+    this._setStartDate(dateObj[0]);
+  }
+
+  _setStartTime(dateObj) {
+    const dateTime = moment(dateObj).utc(true);
+    const date = moment(dateObj).startOf(`day`).utc(true);
+    this._dueStartTime = dateTime.diff(date);
   }
 
   _onCangeCardTime(dateObj) {
-    console.log(dateObj);
-    //this._dueDate += dateObj;
+    this._setStartTime(dateObj[0]);
   }
 
   bind() {
@@ -423,7 +429,7 @@ export default class TaskEdit extends Component {
         altInput: true,
         altFormat: `j F`,
         dateFormat: `j F`,
-        onChange: this._onCangeCardDate
+        onChange: this._onCangeCardDate.bind(this)
       });
       flatpickr(`.card__time`, {
         enableTime: true,
@@ -431,7 +437,7 @@ export default class TaskEdit extends Component {
         altInput: true,
         altFormat: `h:i K`,
         dateFormat: `h:i K`,
-        onChange: this._onCangeCardTime
+        onChange: this._onCangeCardTime.bind(this)
       });
     }
   }

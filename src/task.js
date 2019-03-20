@@ -1,7 +1,6 @@
-import {getDateString, getHTMLFromData, getTimeString} from "./utils";
+import {getHTMLFromData} from './utils';
 import Component from './component';
 import moment from 'moment';
-
 
 export default class extends Component {
   constructor(data) {
@@ -27,9 +26,10 @@ export default class extends Component {
 
   _getClassListHTML() {
     return ` card--${this._color} 
+    ${this._isDeadLine() ? ` card--deadline` : ``}
     ${this._isRepeated() ? ` card--repeat` : ``}
     `;
-  } // ${this._isDeadLine() ? ` card--deadline` : ``}
+  }
 
   _getHashtagHTML(title) {
     return `<span class="card__hashtag-inner">
@@ -96,7 +96,7 @@ export default class extends Component {
                   <div class="card__details">
                     <div class="card__dates">
                         <div class="card__date">
-                          ${moment(this._dueDate).format(`DD MMMM hh:mm`)}
+                          ${moment(this._dueDate).format(`DD MMMM hh:mm A`)}
                         </div>
                     </div>
 
@@ -202,7 +202,7 @@ export default class extends Component {
             </form>
           </article>`;
   }
-//${this._isDeadLine() ? `disabled` : ``}
+
   bind() {
     this._element.querySelector(`.card__btn--edit`)
       .addEventListener(`click`, this._onEditButtonClick);
@@ -219,7 +219,5 @@ export default class extends Component {
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this._dueDate = data.dueDate;
-
-    console.log(data.dueDate);
   }
 }
