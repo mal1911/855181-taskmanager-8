@@ -3,7 +3,7 @@ import Component from './component';
 import flatpickr from 'flatpickr';
 import '../node_modules/flatpickr/dist/flatpickr.min.css';
 import moment from 'moment';
-
+const SPACE_KEY = 32;
 
 export default class TaskEdit extends Component {
   constructor(data) {
@@ -16,16 +16,18 @@ export default class TaskEdit extends Component {
     this._color = data.color;
 
     this._state.isDate = data.dueDate ? true : false;
-    this._state.isRepeated = false;
 
     this._onSubmit = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
 
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
+    this._onAddHashtag = this._onAddHashtag.bind(this);
+    this._onDeleteHashtag = this._onDeleteHashtag.bind(this);
 
     this._setStartDate(this._dueDate);
     this._setStartTime(this._dueDate);
+    this._setRepeatedState();
   }
 
   _processForm(formData) {
@@ -58,12 +60,13 @@ export default class TaskEdit extends Component {
     } else {
       entry.dueDate = this._dueDate;
     }
+    entry.tags = this._tags;
+
     return entry;
   }
 
   static createMapper(target) {
     return {
-      hashtag: (value) => target.tags.add(value),
       text: (value) => {
         target.title = value;
         return target.title;
@@ -116,13 +119,16 @@ export default class TaskEdit extends Component {
 
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
+
     const formData = new FormData(this._element.querySelector(`.card__form`));
     const newData = this._processForm(formData);
 
     if (typeof this._onSubmit === `function`) {
       this._onSubmit(newData);
     }
+
     this.update(newData);
+    this._setRepeatedState();
   }
 
   _onChangeDate() {
@@ -132,7 +138,28 @@ export default class TaskEdit extends Component {
 
   _onChangeRepeated() {
     this._state.isRepeated = !this._state.isRepeated;
+    this._repeatingDays = false;
     this.refresh();
+  }
+
+  _onAddHashtag(evt) {
+    if (evt.ctrlKey && evt.keyCode === SPACE_KEY) {
+      const value = evt.target.value;
+      if (value) {
+        this._tags.add(value);
+        this.refresh();
+      }
+    }
+  }
+
+  _onDeleteHashtag(evt) {
+    const element = evt.target.closest(`.card__hashtag-delete`);
+    if (element) {
+      let text = element.previousElementSibling.innerText;
+      text = text.substring(1, text.length);
+      this._tags.delete(text);
+      this.refresh();
+    }
   }
 
   refresh() {
@@ -415,6 +442,10 @@ export default class TaskEdit extends Component {
     this._setStartTime(dateObj[0]);
   }
 
+  _setRepeatedState() {
+    this._state.isRepeated = this._isRepeated() ? true : false;
+  }
+
   bind() {
     this._element.querySelector(`.card__form`)
       .addEventListener(`submit`, this._onSubmitButtonClick);
@@ -422,7 +453,10 @@ export default class TaskEdit extends Component {
       .addEventListener(`click`, this._onChangeDate);
     this._element.querySelector(`.card__repeat-toggle`)
       .addEventListener(`click`, this._onChangeRepeated);
-
+    this._element.querySelector(`.card__hashtag-input`)
+      .addEventListener(`keydown`, this._onAddHashtag);
+    this._element.querySelector(`.card__hashtag-list`)
+      .addEventListener(`click`, this._onDeleteHashtag);
 
     if (this._state.isDate) {
       flatpickr(`.card__date`, {
@@ -449,7 +483,10 @@ export default class TaskEdit extends Component {
       .removeEventListener(`click`, this._onChangeDate);
     this._element.querySelector(`.card__repeat-toggle`)
       .removeEventListener(`click`, this._onChangeRepeated);
-
+    this._element.querySelector(`.card__hashtag-input`)
+      .removeEventListener(`keydown`, this._onAddHashtag);
+    this._element.querySelector(`.card__hashtag-list`)
+      .removeEventListener(`click`, this._onDeleteHashtag);
   }
 
   update(data) {

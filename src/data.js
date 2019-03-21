@@ -1,4 +1,4 @@
-import {getRandomArray, getRandomInt} from "./utils";
+import {getRandomArray, getRandomBool, getRandomInt} from "./utils";
 
 const titles = [
   `Изучить теорию`,
@@ -29,13 +29,13 @@ export default () => (
     picture: `http://picsum.photos/100/100?r=${Math.random()}`,
     color: colors[getRandomInt(0, 4)],
     repeatingDays: {
-      'mo': getRandomInt(0, 1),
-      'tu': getRandomInt(0, 1),
-      'we': getRandomInt(0, 1),
-      'th': getRandomInt(0, 1),
-      'fr': getRandomInt(0, 1),
-      'sa': getRandomInt(0, 1),
-      'su': getRandomInt(0, 1),
+      'mo': getRandomBool(),
+      'tu': getRandomBool(),
+      'we': getRandomBool(),
+      'th': getRandomBool(),
+      'fr': getRandomBool(),
+      'sa': getRandomBool(),
+      'su': getRandomBool(),
     },
     isFavorite: getRandomInt(0, 1),
     isDone: getRandomInt(0, 1),
